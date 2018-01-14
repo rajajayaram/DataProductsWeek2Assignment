@@ -1,0 +1,33 @@
+---
+title: "IndiaStateWisePolling Leaflet Map"
+author: "Raja"
+date: "14 January 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Indian Legislative Assembly Polls -2009 vs 2014 State Wise Polling Percentage Leaflet Map
+#### Leaflet Map shows Indian States with Capital marked on the map and a histogram of 2009 vs 2014 Polling Percentage
+
+
+```{r,echo=FALSE}
+library(leaflet)
+library(leaflet.minicharts)
+library(htmltools)
+df=read.csv2("Statewise polling Datacsv.csv",header=TRUE,sep=",")
+
+content<-paste(df[1]$State.UT,df[2]$Capital)
+newframe<-data.frame(lat=as.numeric(levels(df$Lat))[df$Lat],lng=as.numeric(levels(df$Long))[df$Long])
+
+chartframe<-data.frame(as.numeric(levels(df$Percentage.of.votes.polled.2009))[df$Percentage.of.votes.polled.2009],as.numeric(levels(df$Percentage.of.votes.polled.2014))[df$Percentage.of.votes.polled.2014])
+colnames(chartframe)<-c("2009 Voting %","2014 Voting %")
+newframe%>%leaflet()%>%addTiles()%>%addCircles(~lng,~lat,popup=content,weight = 3, radius=40, 
+                   color="red", stroke = TRUE, fillOpacity = 0.8) %>% 
+  addCircleMarkers(newframe$lng, newframe$lat, label = ~htmlEscape(content),labelOptions=labelOptions(textOnly=TRUE,direction="bottom")) %>%
+  addMinicharts(newframe$lng, newframe$lat, type="bar", chartdata = chartframe,showLabels=TRUE,legend=TRUE,width = 30, height = 40)
+```
+### Data source:www.data.gov.in and lat long data of state capitals from mapmyindia.com
